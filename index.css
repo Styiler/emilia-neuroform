@@ -1,0 +1,17 @@
+/* Minimal stylesheet to avoid 404 when hosting raw files.
+   The project already loads Tailwind via CDN in index.html, so this file
+   is intentionally small. Replace or extend it if you use a local Tailwind build.
+*/
+
+html, body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Add project-specific overrides here */
