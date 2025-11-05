@@ -145,8 +145,8 @@ const App: React.FC = () => {
                 >
                   {t.goToQuestionnaireBtn}
                 </button>
-                <a
-                    href="https://t.me/emiliyamirkotan"
+        <a
+          href="https://t.me/neopsyhea"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-white border border-blue-500 text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-50 transition-colors duration-300 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto"
