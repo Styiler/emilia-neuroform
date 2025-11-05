@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import { sections, initialFormData } from './constants';
 import type { FormData, FormErrors } from './types';
 import AccordionItem from './components/AccordionItem';
@@ -7,6 +8,10 @@ import { useLanguage } from './context/LanguageContext';
 
 const App: React.FC = () => {
   const { language, setLanguage, t } = useLanguage();
+  // Supabase client
+  const supabaseUrl = 'https://yfgsxhzihffeyzkzohll.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmZ3N4aHppaGZmZXl6a3pvaGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyODc4NDYsImV4cCI6MjA3NTg2Mzg0Nn0.cewl4AWD7n8c12DM13M6ilkhtwsp1dNFZbf_ysNXTmY';
+  const supabase = createClient(supabaseUrl, supabaseKey);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [activeSection, setActiveSection] = useState<number | null>(0); // Start with the first section open
   const [errors, setErrors] = useState<FormErrors>({});
@@ -59,7 +64,8 @@ const App: React.FC = () => {
                  if (typeof sectionData === 'object' && sectionData !== null && q.id in sectionData) {
                     // FIX: Cast sectionData to a generic record to allow dynamic property access.
                     // This prevents TypeScript from inferring `value` as `never` because `sectionData` is a union type with no common keys.
-                    const value = (sectionData as Record<string, unknown>)[q.id];
+                    // FIX: Cast to 'unknown' first to resolve the TypeScript conversion error.
+                    const value = (sectionData as unknown as Record<string, unknown>)[q.id];
                     if (typeof value === 'string' && !value.trim()) {
                         newErrors[q.id] = t.requiredField;
                     } else if (Array.isArray(value) && value.length === 0) {
@@ -94,12 +100,16 @@ const App: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    // In a real app, this would be an API call.
-    console.log('Form Data Submitted:', JSON.stringify(formData, null, 2));
-
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setIsSubmitted(true);
+      // Отправка данных в таблицу 'forms' Supabase
+      const { error } = await supabase
+        .from('forms')
+        .insert([{ data: formData, language }]);
+      if (error) {
+        setSubmitError(t.submitError);
+      } else {
+        setIsSubmitted(true);
+      }
     } catch (error) {
       setSubmitError(t.submitError);
     } finally {
@@ -210,7 +220,8 @@ const App: React.FC = () => {
                            if (typeof sectionData !== 'object' || sectionData === null) return null;
                            // FIX: Cast sectionData to a generic record to allow dynamic property access.
                            // This prevents TypeScript from inferring `value` as `never` because `sectionData` is a union type with no common keys.
-                           const value = (sectionData as Record<string, unknown>)[q.id];
+                           // FIX: Cast to 'unknown' first to resolve the TypeScript conversion error.
+                           const value = (sectionData as unknown as Record<string, unknown>)[q.id];
                           const inputId = `${section.key}-${q.id}`;
 
                           return (
